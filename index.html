@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iCheck App</title>
+  <!-- iCheck CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/iCheck/1.0.2/skins/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 40px;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: #2c3e50;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #7f8c8d;
+      font-size: 0.95rem;
+      margin-bottom: 32px;
+    }
+
+    .section {
+      margin-bottom: 28px;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #95a5a6;
+      margin-bottom: 14px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .check-item:last-child {
+      border-bottom: none;
+    }
+
+    .check-item label {
+      margin-left: 12px;
+      font-size: 0.97rem;
+      color: #34495e;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .check-item input[type="checkbox"],
+    .check-item input[type="radio"] {
+      display: none;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      background: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.97rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .btn:hover {
+      background: #2980b9;
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 16px;
+      background: #ecf0f1;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #2c3e50;
+      display: none;
+    }
+
+    #result h3 {
+      margin-bottom: 8px;
+      color: #27ae60;
+    }
+
+    #result ul {
+      padding-left: 18px;
+    }
+
+    #result li {
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>iCheck App</h1>
+    <p class="subtitle">Selecciona las opciones y haz clic en Guardar</p>
+
+    <!-- Checkboxes -->
+    <div class="section">
+      <div class="section-title">Preferencias</div>
+
+      <div class="check-item">
+        <input type="checkbox" id="notif" name="notif">
+        <label for="notif">Recibir notificaciones</label>
+      </div>
+
+      <div class="check-item">
+        <input type="checkbox" id="newsletter" name="newsletter" checked>
+        <label for="newsletter">Suscribirse al newsletter</label>
+      </div>
+
+      <div class="check-item">
+        <input type="checkbox" id="darkmode" name="darkmode">
+        <label for="darkmode">Modo oscuro</label>
+      </div>
+
+      <div class="check-item">
+        <input type="checkbox" id="analytics" name="analytics" checked>
+        <label for="analytics">Compartir datos de uso</label>
+      </div>
+    </div>
+
+    <!-- Radio buttons -->
+    <div class="section">
+      <div class="section-title">Plan</div>
+
+      <div class="check-item">
+        <input type="radio" id="plan-free" name="plan" value="free" checked>
+        <label for="plan-free">Gratuito</label>
+      </div>
+
+      <div class="check-item">
+        <input type="radio" id="plan-pro" name="plan" value="pro">
+        <label for="plan-pro">Pro</label>
+      </div>
+
+      <div class="check-item">
+        <input type="radio" id="plan-enterprise" name="plan" value="enterprise">
+        <label for="plan-enterprise">Enterprise</label>
+      </div>
+    </div>
+
+    <button class="btn" id="saveBtn">Guardar configuración</button>
+
+    <div id="result">
+      <h3>Configuración guardada</h3>
+      <ul id="resultList"></ul>
+    </div>
+  </div>
+
+  <!-- jQuery -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <!-- iCheck JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/iCheck/1.0.2/icheck.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Inicializar iCheck en checkboxes
+      $('input[type="checkbox"]').iCheck({
+        checkboxClass: 'icheckbox_square-blue',
+        increaseArea: '20%'
+      });
+
+      // Inicializar iCheck en radio buttons
+      $('input[type="radio"]').iCheck({
+        radioClass: 'iradio_square-blue',
+        increaseArea: '20%'
+      });
+
+      // Guardar configuración
+      $('#saveBtn').on('click', function () {
+        var items = [];
+
+        $('input[type="checkbox"]').each(function () {
+          if ($(this).is(':checked')) {
+            items.push($('label[for="' + this.id + '"]').text());
+          }
+        });
+
+        var plan = $('input[name="plan"]:checked').val();
+        items.push('Plan: ' + plan);
+
+        var $list = $('#resultList').empty();
+        items.forEach(function (item) {
+          $list.append('<li>' + item + '</li>');
+        });
+
+        $('#result').fadeIn(300);
+      });
+    });
+  </script>
+</body>
+</html>
